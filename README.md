@@ -19,6 +19,16 @@
     - [Readonly Tuple](#readonly-tuple)
     - [Named Tuples](#named-tuples)
     - [Destructuring Tuples](#destructuring-tuples)
+  - [Object Types](#object-types)
+    - [Type Inference](#type-inference-1)
+    - [Optional Properties](#optional-properties)
+    - [Index Signatures](#index-signatures)
+  - [Enums](#enums)
+    - [Numeric Enums](#numeric-enums)
+      - [Numeric Enums - Default](#numeric-enums---default)
+      - [Numeric Enums - Initialized](#numeric-enums---initialized)
+      - [Numeric Enums - Fully Initialized](#numeric-enums---fully-initialized)
+    - [String Enums](#string-enums)
 
 
 ## Simple Types
@@ -238,4 +248,134 @@ const [x, y] = graph;
 console.log(x); // 55.2
 ```
 
+## Object Types
 
+ประกาศตัวแปรแบบ object
+
+```ts
+const car: { type: string, model: string, year: number } = {
+  type: "Toyota",
+  model: "Corolla",
+  year: 2009
+};
+console.log(car); // { type: 'Toyota', model: 'Corolla', year: 2009 }
+```
+
+### Type Inference
+
+infer type ได้
+
+```ts
+const car = {
+  type: "Toyota",
+};
+car.type = "Ford"; // no error
+car.type = 2; // Error: Type 'number' is not assignable to type 'string'
+```
+
+### Optional Properties
+
+การประกาศ type ของ property ข้างใน จำเป็นต้อง define ทุกอัน ไม่งั้น error
+
+```ts
+const car: { type: string, mileage: number } = {
+  type: "Toyota",
+};
+car.mileage = 2000;
+console.log(car);
+// Error: Property 'mileage' is missing in type '{ type: string; }' but required in type '{ type: string; mileage: number; }'
+```
+
+ทางแก้ --> ใช้ (`?`) ข้างหลัง key กลายเป็น optional property
+
+```ts
+const car: { type: string, mileage?: number } = {
+  type: "Toyota"
+};
+car.mileage = 2000;
+console.log(car); // { type: 'Toyota', mileage: 2000 }
+```
+
+### Index Signatures
+
+ใช้ประกาศ type โดยที่ไม่ต้องมี list ของ property
+
+```ts
+const nameAgeMap: { [index: string]: number } = {};
+nameAgeMap.Jack = 25; // no error
+nameAgeMap.Mark = "Fifty"; // Error: Type 'string' is not assignable to type 'number'.
+```
+
+Index Signatures สามารถใช้งานได้เหมือนกับ `Utility Types` (`Record<string, number>`)
+
+## Enums
+
+เป็น special "class" ที่ property เป็นค่าคงที่ ซึ่งมี 2 แบบคือ
+- `string`
+- `numeric`
+
+### Numeric Enums
+
+property จะเป็น number
+
+#### Numeric Enums - Default
+
+property จะมีค่าเริ่มจาก 0 และเพิ่มทีละ 1 ตามลำดับ
+
+```ts
+enum CardinalDirections {
+  North,
+  East,
+  South,
+  West
+}
+console.log(CardinalDirections.North); // 0
+console.log(CardinalDirections.East); // 1
+console.log(CardinalDirections.South); // 2
+console.log(CardinalDirections.West); // 3
+```
+
+#### Numeric Enums - Initialized
+
+คล้าย default แต่สามารถ set ค่าเริ่มต้นได้
+
+```ts
+enum CardinalDirections {
+  North = 1,
+  East,
+  South,
+  West
+}
+console.log(CardinalDirections.North); // 1
+console.log(CardinalDirections.West); // 4
+```
+
+#### Numeric Enums - Fully Initialized
+
+set ค่าให้ทั้งหมด
+
+```ts
+enum StatusCodes {
+  NotFound = 404,
+  Success = 200,
+  Accepted = 202,
+  BadRequest = 400
+}
+console.log(StatusCodes.NotFound); // 404
+```
+
+### String Enums
+
+enum ที่เป็น string
+
+```ts
+enum CardinalDirections {
+  North = 'North',
+  East = "East",
+  South = "South",
+  West = "West"
+};
+console.log(CardinalDirections.North); // North
+```
+
+จริงๆแล้ว สามารถผสม string กับ numeric ใน enum เดียวกันได้ แต่ไม่แนะนำ

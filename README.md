@@ -29,6 +29,7 @@
       - [Numeric Enums - Initialized](#numeric-enums---initialized)
       - [Numeric Enums - Fully Initialized](#numeric-enums---fully-initialized)
     - [String Enums](#string-enums)
+  - [Type Aliases and Interfaces](#type-aliases-and-interfaces)
 
 
 ## Simple Types
@@ -379,3 +380,5 @@ console.log(CardinalDirections.North); // North
 ```
 
 จริงๆแล้ว สามารถผสม string กับ numeric ใน enum เดียวกันได้ แต่ไม่แนะนำ
+
+## Type Aliases and Interfaces

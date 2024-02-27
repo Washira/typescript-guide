@@ -10,6 +10,10 @@
   - [Special Types](#special-types)
     - [Type: `any`](#type-any)
     - [Type: `unknown`](#type-unknown)
+    - [Type: `never`](#type-never)
+    - [Type: `undefined` \& `null`](#type-undefined--null)
+  - [Arrays](#arrays)
+    - [Readonly](#readonly)
 
 
 ## Simple Types
@@ -100,7 +104,62 @@ console.log(Math.round(v)); // no error as it can be "any" type
 คล้ายๆกับ `any` แต่ปลอดภัยกว่า
 
 ```ts
-let w: unknown = 1; 
+let w: unknown = 1;
 w = "string"; // no error
+
+w = { 
+  runANonExistentMethod: () => {
+    console.log("I think therefore I am");
+  }
+} as { runANonExistentMethod: () => void }
+
+// w.runANonExistentMethod(); // Error: Object is of type 'unknown'.
+
+if(typeof w === 'object' && w !== null) {
+  (w as { runANonExistentMethod: Function }).runANonExistentMethod();
+} // I think therefore I am
 ```
 
+จากตัวอย่าง เราสามารถประกาศ type `unknown` ก่อน ถ้าไม่ทราบว่าเป็น type อะไร แล้วค่อยประกาศทีหลัง โดยใช้ `as` keyword
+
+
+### Type: `never`
+
+ประกาศค่าอะไรก็ error หมด (ไม่ค่อยมีใช้)
+
+```ts
+let x: never = true; // Error: Type 'boolean' is not assignable to type 'never'.
+x: never = 1; // Error: Type 'number' is not assignable to type 'never'.
+x: never = '1'; // Error: Type 'string' is not assignable to type 'never'.
+```
+
+### Type: `undefined` & `null`
+
+
+
+```ts
+let y: undefined = undefined;
+let z: null = null;
+console.log(typeof y); // undefined
+console.log(typeof z); // null
+y = 1; // Error: Type '1' is not assignable to type 'undefined'
+```
+
+## Arrays
+
+รูปแบบทั่วไป ประกาศ type อะไร --> value ทั้งหมดต้องเป็น type นั้น
+
+```ts
+const names: string[] = [];
+names.push("Dylan"); // no error
+// names.push(3); // Error: Argument of type 'number' is not assignable to parameter of type 'string'.
+```
+
+### Readonly
+
+ไม่สามารถเปลี่ยนค่าใน array ได้
+
+```ts
+const names: readonly string[] = ["Dylan"];
+names.push("Jack"); // Error: Property 'push' does not exist on type 'readonly string[]'
+```

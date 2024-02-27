@@ -14,6 +14,11 @@
     - [Type: `undefined` \& `null`](#type-undefined--null)
   - [Arrays](#arrays)
     - [Readonly](#readonly)
+    - [Type Inference](#type-inference)
+  - [Tuples](#tuples)
+    - [Readonly Tuple](#readonly-tuple)
+    - [Named Tuples](#named-tuples)
+    - [Destructuring Tuples](#destructuring-tuples)
 
 
 ## Simple Types
@@ -163,3 +168,74 @@ names.push("Dylan"); // no error
 const names: readonly string[] = ["Dylan"];
 names.push("Jack"); // Error: Property 'push' does not exist on type 'readonly string[]'
 ```
+
+### Type Inference
+
+ts สามารถ infer type ของ array ได้ เหมือนตัวแปร
+
+```ts
+const numbers = [1, 2, 3]; // inferred to type number[]
+numbers.push(4);
+numbers.push("2"); // Error: Argument of type 'string' is not assignable to parameter of type 'number'.
+let head: number = numbers[0]; // no error
+```
+
+## Tuples
+
+คือ array ที่ประกาศ type ของ values ได้มากกว่า 1 type โดยเรียงตาม index
+
+```ts
+// define our tuple
+let ourTuple: [number, boolean, string];
+
+// initialize correctly
+ourTuple = [5, false, 'Coding God was here']; // correct
+ourTuple = [false, 'Coding God was mistaken', 5]; // error
+```
+
+### Readonly Tuple
+
+บางที เราอาจจะเพิ่ม value เกินกว่า type ทำให้ value นั้น ไม่มี type safety
+
+```ts
+// define our tuple
+let ourTuple: [number, boolean, string];
+// initialize correctly
+ourTuple = [5, false, 'Coding God was here'];
+// We have no type safety in our tuple for indexes 3+
+ourTuple.push('Something new and wrong');
+console.log(ourTuple); // [5, false, 'Coding God was here', 'Something new and wrong']
+```
+
+ถ้าไม่ให้เพิ่ม สามารถใช้ `readonly` เหมือน array ได้
+
+```ts
+// define our readonly tuple
+const ourReadonlyTuple: readonly [number, boolean, string] = [5, true, 'The Real Coding God'];
+// throws error as it is readonly.
+ourReadonlyTuple.push('Coding God took a day off');
+```
+
+### Named Tuples
+
+สามารถเพิ่ม context (ชื่อหรือคำอธิบาย) ให้กับ values ใน tuple ได้
+
+```ts
+const graph: [x: number, y: number] = [55.2, 41.3];
+console.log(graph); // [ 55.2, 41.3 ]
+console.log(graph[0]); // 55.2
+console.log(graph[x]); // Cannot find name 'x'
+console.log(x); // Cannot find name 'x'
+```
+
+### Destructuring Tuples
+
+สามารถประกาศตัวแปรแบบ destructuring ได้
+
+```ts
+const graph: [number, number] = [55.2, 41.3];
+const [x, y] = graph;
+console.log(x); // 55.2
+```
+
+

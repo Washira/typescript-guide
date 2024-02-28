@@ -37,6 +37,16 @@
   - [Functions](#functions)
     - [Return Type](#return-type)
     - [Void Return Type](#void-return-type)
+    - [Parameters](#parameters)
+      - [Optional Parameters](#optional-parameters)
+      - [Default Parameters](#default-parameters)
+      - [Named Parameters](#named-parameters)
+      - [Rest Parameters](#rest-parameters)
+    - [Type Alias](#type-alias)
+  - [Casting](#casting)
+    - [Casting with `as`](#casting-with-as)
+    - [Casting with `<>`](#casting-with-)
+    - [Force casting](#force-casting)
 
 
 ## Simple Types
@@ -527,10 +537,130 @@ console.log(add(5, 10)); // 15
 ถ้าไม่มีการ return ค่าอะไร ให้ประกาศ return type เป็น `void`
 
 ```ts
-function log(message: string): void
-{
+function log(message: string): void {
   console.log(message);
 }
 log("Hello, world!"); // Hello, world!
 ```
 
+### Parameters
+
+ประกาศ type ของ parameter ได้
+
+```ts
+function log(message: string, userId?: string) {
+  console.log(message, userId);
+}
+log("Hello, world!"); // Hello, world! undefined
+log("Hello, world!", "Dylan"); // Hello, world! Dylan
+```
+
+ถ้าไม่มีการประกาศ type ของ parameter จะเป็น `any` จนกว่าจะใส่ type ให้
+
+#### Optional Parameters
+
+ประกาศ parameter ให้เป็น optional ได้
+
+```ts
+function log(message: string, userId?: string) {
+  console.log(message, userId);
+}
+log("Hello, world!"); // Hello, world! undefined
+log("Hello, world!", "Dylan"); // Hello, world! Dylan
+```
+
+#### Default Parameters
+
+ประกาศ parameter ให้มีค่าเริ่มต้นได้
+
+```ts
+function log(message: string, userId = "Not signed in") {
+  console.log(message, userId);
+}
+log("Hello, world!"); // Hello, world! Not signed in
+log("Hello, world!", "Dylan"); // Hello, world! Dylan
+```
+
+#### Named Parameters
+
+ประกาศ parameter ให้มีชื่อได้ โดยใช้ object
+
+```ts
+function divide({ dividend, divisor }: { dividend: number, divisor: number }) {
+  return dividend / divisor;
+}
+console.log(divide({dividend: 10, divisor: 2})); // 5
+```
+
+#### Rest Parameters
+
+ประกาศ parameter ให้เป็น rest ได้
+
+```ts
+function add(a: number, b: number, ...rest: number[]) {
+  return a + b + rest.reduce((p, c) => p + c, 0);
+}
+console.log(add(10,10,10,10,10)); // 50
+```
+
+### Type Alias
+
+ประกาศ type ของ function แล้วเอามาใช้
+
+```ts
+type Add = (a: number, b: number) => number;
+const add: Add = (a, b) => a + b;
+console.log(add(5, 10)); // 15
+```
+
+## Casting
+
+การเปลี่ยน type ของตัวแปร โดยใช้ `as` keyword หรือ `<>` ในการ cast <br>
+บางครั้งในการทำงาน เราจำเป็นต้องเปลี่ยน type ของตัวแปร เช่นการรับค่าที่ type ไม่ถูกต้อง มาจาก Library
+
+### Casting with `as`
+
+การใช้ `as` keyword ในการ cast
+
+```ts
+let value: any = "Hello, world!";
+let length: number = (value as string).length;
+console.log(length); // 13
+
+let x: unknown = 'hello';
+console.log((x as string).length); // 5
+console.log(typeof x); // string
+```
+
+เราไม่สามารถ cast ได้เสมอไป ถ้าไม่เป็น type ที่ถูกต้อง ก็จะ error
+
+```ts
+let x: unknown = 4;
+console.log((x as string).length); // prints undefined since numbers don't have a length
+console.log(typeof x); // number
+```
+
+### Casting with `<>`
+
+การใช้ `<>` ในการ cast
+
+```ts
+let value: any = "Hello, world!";
+let length: number = (<string>value).length;
+console.log(length); // 13
+
+let x: unknown = 'hello';
+console.log((<string>x).length); // 5
+console.log(typeof x); // string
+```
+
+การ cast แบบนี้ไม่สามารถทำงาน บน `TSX` ได้
+
+### Force casting
+
+ตัองการ override type ของตัวแปร ที่ error โดยเปลี่ยนเป็น `unknown` ก่อน แล้วค่อย cast กลับเป็น type ที่ต้องการ
+
+```ts
+let x = 'hello';
+console.log(((x as unknown) as number).length); // x is not actually a number so this will return undefined
+```

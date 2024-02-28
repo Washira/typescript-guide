@@ -30,6 +30,13 @@
       - [Numeric Enums - Fully Initialized](#numeric-enums---fully-initialized)
     - [String Enums](#string-enums)
   - [Type Aliases and Interfaces](#type-aliases-and-interfaces)
+    - [Type Aliases](#type-aliases)
+    - [Interfaces](#interfaces)
+  - [Union Types](#union-types)
+    - [Union Type Errors](#union-type-errors)
+  - [Functions](#functions)
+    - [Return Type](#return-type)
+    - [Void Return Type](#void-return-type)
 
 
 ## Simple Types
@@ -382,3 +389,148 @@ console.log(CardinalDirections.North); // North
 จริงๆแล้ว สามารถผสม string กับ numeric ใน enum เดียวกันได้ แต่ไม่แนะนำ
 
 ## Type Aliases and Interfaces
+
+ใน ts เราสามารถประกาศ type แยกจากตัวแปรได้ แล้วค่อยเอามาใช้ทีหลัง มี 2 แบบคือ
+
+### Type Aliases
+
+ประกาศ type แบบให้ชื่อใหม่
+
+```ts
+type Point = {
+  x: number;
+  y: number;
+};
+const point: Point = {
+  x: 5,
+  y: 10
+};
+console.log(point); // { x: 5, y: 10 }
+```
+
+### Interfaces
+
+ประกาศ type แบบให้ชื่อใหม่ และสามารถ extend ได้ ใช้สำหรับ object เท่านั้น
+
+```ts
+interface Point {
+  x: number;
+  y: number;
+}
+const point: Point = {
+  x: 5,
+  y: 10
+};
+console.log(point); // { x: 5, y: 10 }
+```
+
+ตัวอย่างการ extend
+
+```ts
+interface Point {
+  x: number;
+  y: number;
+}
+interface Point3D extends Point {
+  z: number;
+}
+const point3D: Point3D = {
+  x: 5,
+  y: 10,
+  z: 20
+};
+console.log(point3D); // { x: 5, y: 10, z: 20 }
+```
+
+หรือใช้ `extends` กับ type alias ได้เหมือนกัน
+
+```ts
+type Point = {
+  x: number;
+  y: number;
+};
+type Point3D = Point & { z: number };
+const point3D: Point3D = {
+  x: 5,
+  y: 10,
+  z: 20
+};
+console.log(point3D); // { x: 5, y: 10, z: 20 }
+```
+
+## Union Types
+
+ประกาศ type ที่เป็นไปได้หลาย type
+
+```ts
+let union: string | number;
+union = "string";
+union = 3;
+union = true; // Error: Type 'boolean' is not assignable to type 'string | number'.
+```
+
+สามารถใช้กับ object ได้
+
+```ts
+let union: { name: string } | { age: number };
+union = { name: "Dylan" };
+union = { age: 25 };
+union = { name: "Dylan", age: 25 }; // Error: Object literal may only specify known properties, and 'age' does not exist in type '{ name: string; } | { age: number; }'.
+```
+
+```ts
+function printStatusCode(code: string | number) {
+  console.log(`My status code is ${code}.`)
+}
+printStatusCode(404);
+printStatusCode('404');
+printStatusCode(true); // Error: Argument of type 'boolean' is not assignable to parameter of type 'string | number'.
+```
+
+### Union Type Errors
+
+เมื่อใช้ union type แล้ว ถ้าเราใช้ method หรือ property ที่ไม่ได้อยู่ในทั้ง 2 type ที่เป็นไปได้ ก็จะ error
+
+```ts
+let union: string | number;
+union = "string";
+union = 3;
+console.log(union.length); // Error: Property 'length' does not exist on type 'string | number'.
+```
+
+## Functions
+
+ประกาศ type ของ function
+
+### Return Type
+
+ประกาศ return type ของ function
+
+```ts
+function add(a: number, b: number): number {
+  return a + b;
+}
+console.log(add(5, 10)); // 15
+```
+
+ถ้าไม่ประกาศ return type จะ infer ได้
+
+```ts
+function add(a: number, b: number) {
+  return a + b;
+}
+console.log(add(5, 10)); // 15
+```
+
+### Void Return Type
+
+ถ้าไม่มีการ return ค่าอะไร ให้ประกาศ return type เป็น `void`
+
+```ts
+function log(message: string): void
+{
+  console.log(message);
+}
+log("Hello, world!"); // Hello, world!
+```
+

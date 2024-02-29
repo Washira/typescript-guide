@@ -47,6 +47,15 @@
     - [Casting with `as`](#casting-with-as)
     - [Casting with `<>`](#casting-with-)
     - [Force casting](#force-casting)
+  - [Classes](#classes)
+    - [Members: `Types`](#members-types)
+    - [Members: `Visibility`](#members-visibility)
+    - [Parameter Properties](#parameter-properties)
+    - [Readonly](#readonly-1)
+    - [Inheritance: `Implements`](#inheritance-implements)
+    - [Inheritance: `Extends`](#inheritance-extends)
+    - [Override](#override)
+    - [Abstract Classes](#abstract-classes)
 
 
 ## Simple Types
@@ -663,4 +672,245 @@ console.log(typeof x); // string
 ```ts
 let x = 'hello';
 console.log(((x as unknown) as number).length); // x is not actually a number so this will return undefined
+```
+
+## Classes
+
+ประกาศ class และ type ของ property และ method
+
+### Members: `Types`
+
+ประกาศ type ของ property และ method
+
+```ts
+class Point {
+  x: number;
+  y: number;
+  draw() {
+    console.log(`X: ${this.x}, Y: ${this.y}`);
+  }
+}
+let point = new Point();
+point.x = 1;
+point.y = 2;
+point.draw(); // X: 1, Y: 2
+```
+
+### Members: `Visibility`
+
+ประกาศ visibility ของ property และ method
+
+visibility มี 3 แบบ ได้แก่
+- `public`: (default) สามารถเข้าถึงได้จากภายนอก class
+- `private`: สามารถเข้าถึงได้จากภายใน class เท่านั้น
+- `protected`: สามารถเข้าถึงได้จากภายใน class และ subclass
+
+```ts
+class Point {
+  private x: number;
+  private y: number;
+  draw() {
+    console.log(`X: ${this.x}, Y: ${this.y}`);
+  }
+}
+let point = new Point();
+point.x = 1; // Error: Property 'x' is private and only accessible within class 'Point'.
+point.y = 2; // Error: Property 'y' is private and only accessible within class 'Point'.
+point.draw(); // X: undefined, Y: undefined
+```
+
+### Parameter Properties
+
+ประกาศ property และ assign ค่าให้ตัวแปรใน constructor ได้
+
+```ts
+class Point {
+  private x: number;
+  private y: number;
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+  draw() {
+    console.log(`X: ${this.x}, Y: ${this.y}`);
+  }
+}
+let point = new Point(1, 2);
+point.draw(); // X: 1, Y: 2
+```
+
+`this` คือ instance ของ class ที่ถูกสร้างขึ้นมา
+
+### Readonly
+
+ประกาศ property ให้เป็น readonly ได้
+
+```ts
+class Point {
+  readonly x: number;
+  readonly y: number;
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+  draw() {
+    console.log(`X: ${this.x}, Y: ${this.y}`);
+  }
+}
+let point = new Point(1, 2);
+point.x = 3; // Error: Cannot assign to 'x' because it is a read-only property.
+point.y = 4; // Error: Cannot assign to 'y' because it is a read-only property.
+point.draw(); // X: 1, Y: 2
+```
+
+### Inheritance: `Implements`
+
+ประกาศ class ที่ implement interface
+
+```ts
+interface Shape {
+  getArea: () => number;
+}
+
+class Rectangle implements Shape {
+  public constructor(protected readonly width: number, protected readonly height: number) {}
+
+  public getArea(): number {
+    return this.width * this.height;
+  }
+}
+
+const myRect = new Rectangle(10,20);
+
+console.log(myRect.getArea()); // 200
+```
+
+### Inheritance: `Extends`
+
+ประกาศ class ที่ extend class อื่น
+
+```ts
+interface Shape {
+  getArea: () => number;
+}
+      
+class Rectangle implements Shape {
+  public constructor(protected readonly width: number, protected readonly height: number) {}
+
+  public getArea(): number {
+    return this.width * this.height;
+  }
+}
+      
+class Square extends Rectangle {
+  public constructor(width: number) {
+    super(width, width);
+  }
+  // getArea gets inherited from Rectangle
+}
+
+const mySq = new Square(20);
+console.log(mySq.getArea()); // 400
+```
+
+นอกจากนั่้น ยังสามารถ extend interface จาก interface อื่นได้
+
+```ts
+interface Shape {
+  getArea: () => number;
+}
+
+interface Shape2 extends Shape {
+  getSquare: () => number;
+}
+
+class Rectangle implements Shape {
+  public constructor(protected readonly width: number, protected readonly height: number) {}
+  public getArea(): number {
+    return this.width * this.height;
+  }
+}
+
+class Square implements Shape2 {
+	public constructor(protected readonly width: number, protected readonly height: number, protected readonly depth: number) {}
+    public getArea(): number {
+      return this.width * this.height;
+    }
+    public getSquare(): number {
+      return this.width * this.height * this.depth;
+    }
+}
+
+const myRect = new Rectangle(10,20);
+const mySquare = new Square(10,20,30);
+
+console.log(myRect.getArea());
+console.log(mySquare.getSquare());
+```
+
+### Override
+
+`override` คือการแทนที่ member จาก class ที่ extend มา โดยที่มีชื่อ member ที่เหมือนกัน
+
+```ts
+interface Shape {
+  getArea: () => number;
+}
+
+class Rectangle implements Shape {
+  // using protected for these members allows access from classes that extend from this class, such as Square
+  public constructor(protected readonly width: number, protected readonly height: number) {}
+
+  public getArea(): number {
+    return this.width * this.height;
+  }
+
+  public toString(): string {
+    return `Rectangle[width=${this.width}, height=${this.height}]`;
+  }
+}
+
+class Square extends Rectangle {
+  public constructor(width: number) {
+    super(width, width);
+  }
+
+  // this toString replaces the toString from Rectangle
+  public override toString(): string {
+    return `Square[width=${this.width}]`;
+  }
+}
+
+const mySq = new Square(20);
+
+console.log(mySq.toString());
+```
+
+### Abstract Classes
+
+`abstract` คือ class ต้นแบบที่นำไปเป็นต้นแบบของ class อื่นๆ โดยที่ไม่สามารถสร้าง instance ได้ แต่สามารถ `extend` ได้
+
+```ts
+abstract class Polygon {
+  public abstract getArea(): number;
+
+  public toString(): string {
+    return `Polygon[area=${this.getArea()}]`;
+  }
+}
+
+class Rectangle extends Polygon {
+  public constructor(protected readonly width: number, protected readonly height: number) {
+    super();
+  }
+
+  public getArea(): number {
+    return this.width * this.height;
+  }
+}
+
+const myRect = new Rectangle(10,20);
+
+console.log(myRect.getArea()); // 200
+console.log(myRect.toString()); // Polygon[area=200]
 ```

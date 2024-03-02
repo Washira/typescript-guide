@@ -76,6 +76,12 @@
   - [Keyof](#keyof)
     - [`keyof` with explicit keys](#keyof-with-explicit-keys)
     - [`keyof` with index signatures](#keyof-with-index-signatures)
+  - [Null \& Undefined](#null--undefined)
+    - [Types](#types)
+    - [Optional Chaining](#optional-chaining)
+    - [Nullish Coalescence](#nullish-coalescence)
+    - [Null Assertion](#null-assertion)
+    - [Array bounds handling](#array-bounds-handling)
 
 
 ## Simple Types
@@ -1275,4 +1281,89 @@ function createStringPair(property: keyof StringMap, value: string): StringMap {
 }
 let pair = createStringPair("name", "Max");
 console.log(pair); // { name: "Max" }
+```
+
+## Null & Undefined
+
+ใน ts มี type ที่เป็นไปได้คือ `null` และ `undefined` โดยใช้ `null` และ `undefined` ในการประกาศ type ได้
+
+โดย default ของ ts คือ `strictNullChecks` ที่เป็น `true` ซึ่งทำให้ไม่สามารถ assign `null` หรือ `undefined` ให้กับ type ที่ไม่ใช่ `null` หรือ `undefined` ได้
+
+### Types
+
+ประกาศ type ของ `null` และ `undefined`
+
+```ts
+let value: string | undefined | null = null;
+console.log(typeof value); // object
+
+value = 'hello';
+console.log(typeof value); // string
+
+value = undefined;
+console.log(typeof value); // undefined
+```
+### Optional Chaining
+
+Optional chaining คือ การเข้าถึง property ของ object โดยที่ไม่ต้องกังวลเรื่อง `null` หรือ `undefined` โดยใช้ `?.` หลัง property ที่ต้องการเข้าถึง
+
+```ts
+interface House {
+  sqft: number;
+  yard?: {
+    sqft: number;
+  };
+}
+function printYardSize(house: House) {
+  const yardSize = house.yard?.sqft;
+  if (yardSize === undefined) {
+    console.log('No yard');
+  } else {
+    console.log(`Yard is ${yardSize} sqft`);
+  }
+}
+
+let home: House = {
+  sqft: 500
+};
+
+printYardSize(home); // Prints 'No yard'
+```
+
+### Nullish Coalescence
+
+Nullish coalescence คือ การเลือกค่าที่ไม่ใช่ `null` หรือ `undefined` จาก 2 ค่าที่เป็นไปได้ โดยใช้ `??`
+
+```ts
+function printMileage(mileage: number | null | undefined) {
+  console.log(`Mileage: ${mileage ?? 'Not Available'}`);
+}
+      
+printMileage(null); // Prints 'Mileage: Not Available'
+printMileage(0); // Prints 'Mileage: 0'
+```
+
+### Null Assertion
+
+Null assertion คือ การบอก ts ว่าตัวแปรนั้นไม่ใช่ `null` หรือ `undefined` โดยใช้ `!` หลังตัวแปร
+
+```ts
+function getValue(): string | undefined {
+  return 'hello';
+}
+let value = getValue();
+console.log('value length: ' + value!.length);
+```
+
+การใช้ null assertion ก็ยังสามารถ error ได้ ถ้า type ไม่ make sense หรือไม่ถูกต้อง
+
+### Array bounds handling
+
+เมื่อตั้งค่า `strictNullChecks` แล้ว ก็จะไม่สามารถเข้าถึง index ของ array ที่ไม่มีค่า หรือเป็น `undefined` ได้
+ต้องตั้งค่า `noUncheckedIndexedAccess` เป็น `true` ด้วย
+
+```ts
+let array: number[] = [];
+let value = array[0]; // with `noUncheckedIndexedAccess` this has the type `number | undefined`
+console.log(value);
 ```

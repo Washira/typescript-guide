@@ -66,6 +66,7 @@
     - [Partial](#partial)
     - [Required](#required)
     - [Record](#record)
+    - [Omit](#omit)
 
 
 ## Simple Types
@@ -1093,3 +1094,31 @@ console.log(point); // { x: 5, y: 10 }
 
 `Record<string, number>` คือ ประกาศ object ที่ key เป็น string และ value เป็น number (`{ [key: string]: number }`)
 
+### Omit
+
+Omit คือ การลบ property ออกจาก object
+
+```ts
+interface Point {
+  x: number;
+  y: number;
+  z: number;
+}
+let point: Omit<Point, 'z'> = { x: 5, y: 10 }; // `Omit` removes z from the object
+console.log(point); // { x: 5, y: 10 }
+```
+
+สามารถใช้ union เพื่อลบทีละหลายๆ property ได้
+
+```ts
+interface Person {
+  name: string;
+  age: number;
+  location?: string;
+}
+const bob: Omit<Person, 'age' | 'location'> = {
+  name: 'Bob'
+  // `Omit` has removed age and location from the type and they can't be defined here
+};
+console.log(bob);
+```

@@ -56,6 +56,12 @@
     - [Inheritance: `Extends`](#inheritance-extends)
     - [Override](#override)
     - [Abstract Classes](#abstract-classes)
+  - [Basic Generics](#basic-generics)
+    - [Functions](#functions-1)
+    - [Classes](#classes-1)
+    - [Type Aliases](#type-aliases-1)
+    - [Default Value](#default-value)
+    - [Extends](#extends)
 
 
 ## Simple Types
@@ -913,4 +919,130 @@ const myRect = new Rectangle(10,20);
 
 console.log(myRect.getArea()); // 200
 console.log(myRect.toString()); // Polygon[area=200]
+```
+
+## Basic Generics
+
+ประกาศ type ที่เป็นไปได้หลาย type โดยใช้ `<>` ในการประกาศ ไม่ว่าจะเป็น class หรือ function ก็สามารถใช้ generics ได้
+
+```ts
+function echo<T>(arg: T): T {
+  return arg;
+}
+console.log(echo("Hello, world!")); // Hello, world!
+console.log(echo(5)); // 5
+```
+
+### Functions
+
+ประกาศ type ของ function ที่รับ parameter และ return type ที่เป็นไปได้หลาย type
+
+```ts
+function createPair<S, T>(v1: S, v2: T): [S, T] {
+  return [v1, v2];
+}
+console.log(createPair<string, number>('hello', 42)); // ['hello', 42]
+```
+
+ts สามารถ infer type ของ parameter ใน function ได้ 
+
+### Classes
+
+ประกาศ type ของ class ที่เป็นไปได้หลาย type
+
+```ts
+class NamedValue<T> {
+  private _value: T | undefined;
+
+  constructor(private name: string) {}
+
+  public setValue(value: T) {
+    this._value = value;
+  }
+
+  public getValue(): T | undefined {
+    return this._value;
+  }
+
+  public toString(): string {
+    return `${this.name}: ${this._value}`;
+  }
+}
+
+let value = new NamedValue<number>('myNumber');
+value.setValue(10);
+console.log(value.toString()); // myNumber: 10
+```
+
+ts สามารถ infer type ของ property ใน class ได้ แต่ต้องประกาศ parameter ให้กับ constructor ก่อน
+
+### Type Aliases
+
+ประกาศ type ที่เป็นไปได้หลาย type แล้วเอามาใช้
+
+```ts
+type Pair<S, T> = [S, T];
+function createPair<S, T>(v1: S, v2: T): Pair<S, T> {
+  return [v1, v2];
+}
+console.log(createPair<string, number>('hello', 42)); // ['hello', 42]
+```
+
+สามารถใช้กับ interface ได้เหมือนกัน โดยประกาศแบบ `interface Pair<S, T> = [S, T];`
+
+### Default Value
+
+สามารถใช้ generic ประกาศค่า type ให้เป็น default ได้
+
+```ts
+function echo<T = string>(arg: T): T {
+  return arg;
+}
+console.log(echo("Hello, world!")); // Hello, world!
+console.log(echo(5)); // 5
+
+class NamedValue<T = string> {
+  private _value: T | undefined;
+
+  constructor(private name: string) {}
+
+  public setValue(value: T) {
+    this._value = value;
+  }
+
+  public getValue(): T | undefined {
+    return this._value;
+  }
+
+  public toString(): string {
+    return `${this.name}: ${this._value}`;
+  }
+}
+
+let value = new NamedValue('myNumber');
+value.setValue('myValue');
+console.log(value.toString()); // myNumber: myValue
+```
+
+สังเกต ในตัวอย่าง ไม่ต้องประกาศ type ของ parameter ให้กับ function และ constructor ก็ได้ เพราะว่า มี default value แล้ว
+เช่น `function echo<T = string>(arg: T): T` มี default value เป็น string และ `class NamedValue<T = string>` ก็มี default value เป็น string
+
+### Extends
+
+สามารถใช้ extend ได้ เพื่อกำหนดขอบเขตของ type ที่เป็นไปได้
+
+```ts
+function createLoggedPair<S extends string | number, T extends string | number>(v1: S, v2: T): [S, T] {
+  console.log(`creating pair: v1='${v1}', v2='${v2}'`);
+  return [v1, v2];
+}
+```
+
+นอกจากนั้น ยังสามารถใช้ร่วมกันกับ default value ได้
+
+```ts
+function createLoggedPair<S extends string | number = string, T extends string | number = string>(v1: S, v2: T): [S, T] {
+  console.log(`creating pair: v1='${v1}', v2='${v2}'`);
+  return [v1, v2];
+}
 ```

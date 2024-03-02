@@ -62,6 +62,10 @@
     - [Type Aliases](#type-aliases-1)
     - [Default Value](#default-value)
     - [Extends](#extends)
+  - [Utility Types](#utility-types)
+    - [Partial](#partial)
+    - [Required](#required)
+    - [Record](#record)
 
 
 ## Simple Types
@@ -1046,3 +1050,46 @@ function createLoggedPair<S extends string | number = string, T extends string |
   return [v1, v2];
 }
 ```
+
+## Utility Types
+
+ts มี built-in type ที่ช่วยในการประกาศ type ได้ โดยไม่ต้องประกาศ type ใหม่ โดยใช้ `Utility Types` ได้แก่
+
+### Partial
+
+ทำให้ทุก property ใน object กลายเป็น optional
+
+```ts
+interface Point {
+  x: number;
+  y: number;
+}
+let point: Partial<Point> = {}; // `Partial` allows x and y to be optional
+point.x = 5;
+console.log(point); // { x: 5 }
+```
+
+### Required
+
+ทำให้ทุก property ใน object กลายเป็น required
+
+```ts
+interface Point {
+  x?: number;
+  y?: number;
+}
+let point: Required<Point> = { x: 5 }; // `Required` makes x and y required
+console.log(point); // { x: 5, y: undefined }
+```
+
+### Record
+
+Record คือ shortcut ที่กำหนด key type และ value type ของ object (คล้ายๆกับ Index Signatures)
+
+```ts
+let point: Record<string, number> = { x: 5, y: 10 };
+console.log(point); // { x: 5, y: 10 }
+```
+
+`Record<string, number>` คือ ประกาศ object ที่ key เป็น string และ value เป็น number (`{ [key: string]: number }`)
+

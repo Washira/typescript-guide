@@ -1365,5 +1365,5 @@ console.log('value length: ' + value!.length);
 ```ts
 let array: number[] = [];
 let value = array[0]; // with `noUncheckedIndexedAccess` this has the type `number | undefined`
-console.log(value);
+console.log(value); // undefined
 ```

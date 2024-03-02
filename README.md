@@ -67,6 +67,12 @@
     - [Required](#required)
     - [Record](#record)
     - [Omit](#omit)
+    - [Pick](#pick)
+    - [Exclude](#exclude)
+    - [Extract](#extract)
+    - [ReturnType](#returntype)
+    - [Parameters](#parameters-1)
+    - [Readonly](#readonly-2)
 
 
 ## Simple Types
@@ -1122,3 +1128,88 @@ const bob: Omit<Person, 'age' | 'location'> = {
 };
 console.log(bob);
 ```
+
+### Pick
+
+Pick คือ การเลือก property ที่ต้องการจาก object ที่เหลือลบออกหมด
+
+```ts
+interface Person {
+  name: string;
+  age: number;
+  location?: string;
+}
+const bob: Pick<Person, 'name'> = {
+  name: 'Bob'
+  // `Pick` has only kept name, so age and location were removed from the type and they can't be defined here
+};
+console.log(bob);
+```
+
+### Exclude
+
+Exclude คือ การลบ type ที่เป็นไปได้ออกจาก union type
+
+```ts
+type Primitive = string | number | boolean
+const value: Exclude<Primitive, string> = true; // a string cannot be used here since Exclude removed it from the type.
+console.log(value); // true
+```
+
+### Extract
+
+Extract คือ การเลือก type ที่ต้องการจาก union type
+
+```ts
+type Primitive = string | number | boolean
+const value: Extract<Primitive, string> = 'hello'; // only a string can be used here since Extract removed the other types from the type.
+console.log(value); // hello
+```
+
+### ReturnType
+
+ReturnType คือ การเลือก type ของ return value จาก function
+
+```ts
+function add(a: number, b: number) {
+  return a + b;
+}
+const value: ReturnType<typeof add> = 5; // the return type of add is a number
+console.log(value); // 5
+
+type PointGenerator = () => { x: number; y: number; };
+const point: ReturnType<PointGenerator> = {
+  x: 10,
+  y: 20
+};
+console.log(point); // { x: 10, y: 20 }
+```
+
+### Parameters
+
+Parameters คือ การเลือก type ของ parameter จาก function โดยใช้ index
+
+```ts
+type PointPrinter = (p: { x: number; y: number; }) => void;
+
+const point: Parameters<PointPrinter>[0] = {
+  x: 10,
+  y: 20
+};
+console.log(point); // { x: 10, y: 20 }
+```
+
+### Readonly
+
+Readonly คือ การเปลี่ยน property ให้เป็น readonly
+
+```ts
+interface Point {
+  x: number;
+  y: number;
+}
+const point: Readonly<Point> = { x: 5, y: 10 };
+point.x = 10; // Error: Cannot assign to 'x' because it is a read-only property.
+console.log(point); // { x: 5, y: 10 }
+```
+

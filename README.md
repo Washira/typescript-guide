@@ -73,6 +73,9 @@
     - [ReturnType](#returntype)
     - [Parameters](#parameters-1)
     - [Readonly](#readonly-2)
+  - [Keyof](#keyof)
+    - [`keyof` with explicit keys](#keyof-with-explicit-keys)
+    - [`keyof` with index signatures](#keyof-with-index-signatures)
 
 
 ## Simple Types
@@ -1213,3 +1216,63 @@ point.x = 10; // Error: Cannot assign to 'x' because it is a read-only property.
 console.log(point); // { x: 5, y: 10 }
 ```
 
+## Keyof
+
+Keyof คือ keyword ที่ใช้ในการเลือก key type ของ object
+
+```ts
+interface Point {
+  x: number;
+  y: number;
+}
+const key: keyof Point = 'x';
+console.log(key); // x
+```
+
+### `keyof` with explicit keys
+
+สามารถใช้ keyof กับ object ที่มีการประกาศ key โดย keyof จะ union ทุก key ของ object นั้นๆ
+
+ตัวอย่างการใช้งาน
+
+```ts
+interface Person {
+  name: string;
+  age: number;
+}
+
+// `keyof Person` here creates a union type of "name" and "age", other strings will not be allowed
+function printPersonProperty(person: Person, property: keyof Person) {
+  console.log(`Printing person property ${property}: "${person[property]}"`);
+}
+
+let person = {
+  name: "Max",
+  age: 27
+};
+
+printPersonProperty(person, "name"); // Printing person property name: "Max"s
+printPersonProperty(person, "age"); // Printing person property age: "27"
+printPersonProperty(person, "location"); // Error: Argument of type '"location"' is not assignable to parameter of type '"name" | "age"'.
+```
+
+### `keyof` with index signatures
+
+สามารถใช้ keyof กับ object ที่มีการประกาศ index signature ได้
+
+```ts
+interface Dictionary {
+  [key: string]: string;
+}
+let keys: keyof
+Dictionary = "name";
+console.log(keys); // name
+
+type StringMap = { [key: string]: unknown };
+// `keyof StringMap` resolves to `string` here
+function createStringPair(property: keyof StringMap, value: string): StringMap {
+  return { [property]: value };
+}
+let pair = createStringPair("name", "Max");
+console.log(pair); // { name: "Max" }
+```
